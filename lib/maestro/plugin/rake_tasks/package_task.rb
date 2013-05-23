@@ -95,11 +95,8 @@ module Maestro
           abort "ERROR: Plugin name is missing" unless @plugin_name
           abort "ERROR: Plugin version is missing" unless @version
 
-          # Add the commit hash to the version if it's available
-          git_version! if File.exists?('.git')
-
           # If we use a template, use it to create the manifest
-          update_manifest if File.exists?(@manifest_template_path)
+          update_manifest(git_version)
 
           # Create the zip file
           create_zip_file("#{@plugin_name}-#{@version}.zip")
@@ -116,25 +113,27 @@ module Maestro
           @version ||= doc.at_xpath('/xmlns:project/xmlns:version').text
         end
 
-        def git_version!
+        def git_version
           git = Git.open('.')
           # check if there are modified files
           if git.status.select { |s| s.type == 'M' }.empty?
             commit = git.log.first.sha[0..5]
-            @version = "#{@version}-#{commit}"
+            "#{@version}-#{commit}"
           else
             warn "WARNING: There are modified files, not using commit hash in version"
+            @version
           end
-          @version
         end
 
         # update the version number in the manifest file.
-        def update_manifest
+        def update_manifest(manifest_version)
+          return @version unless File.exists?('.git')
+
           manifest = JSON.parse(IO.read(@manifest_template_path))
           if manifest.instance_of? Array
-            manifest.each { |m| m['version'] = @version }
+            manifest.each { |m| m['version'] = manifest_version }
           else
-            manifest['version'] = @version
+            manifest['version'] = manifest_version
           end
 
           File.open('manifest.json','w'){ |f| f.write(JSON.pretty_generate(manifest)) }
