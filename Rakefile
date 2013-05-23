@@ -5,7 +5,7 @@ require 'rake/clean'
 CLEAN.include('pkg', 'manifest.json', '*.zip')
 CLOBBER.include('.bundle', '.config', 'coverage', 'InstalledFiles', 'spec/reports', 'rdoc', 'test', 'tmp')
 
-task :default => [:clean, :bundle, :spec, :build]
+task :default => [:clean, :spec, :build]
 
 RSpec::Core::RakeTask.new
 
