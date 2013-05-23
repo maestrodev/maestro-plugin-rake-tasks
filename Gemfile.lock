@@ -5,7 +5,7 @@ PATH
       git
       json (>= 1.4.6)
       nokogiri
-      rake (~> 0.9.2)
+      rake (>= 0.9.2)
       zippy
 
 GEM
@@ -18,7 +18,7 @@ GEM
       bouncy-castle-java (>= 1.5.0147)
     json (1.8.0-java)
     nokogiri (1.5.9-java)
-    rake (0.9.6)
+    rake (10.0.3)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
