@@ -25,5 +25,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'json', '>= 1.4.6'
 
   spec.add_development_dependency 'rspec', '~> 2.13.0'
-
+  spec.add_development_dependency 'jruby-openssl'
 end
