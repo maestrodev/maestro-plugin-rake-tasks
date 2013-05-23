@@ -65,7 +65,7 @@ describe Maestro::Plugin::RakeTasks::PackageTask do
     manifest_path = File.dirname(__FILE__) + '/../../../../manifest.json'
     File.exists?(manifest_path).should be_true
     manifest = JSON.parse(IO.read(manifest_path))
-    manifest.first['version'].should == 'X.Y.Z'
+    manifest.first['version'].should start_with 'X.Y.Z'
 
   end
 
@@ -78,7 +78,7 @@ describe Maestro::Plugin::RakeTasks::PackageTask do
     manifest_path = File.dirname(__FILE__) + '/../../../../manifest.json'
     File.exists?(manifest_path).should be_true
     manifest = JSON.parse(IO.read(manifest_path))
-    manifest['version'].should == 'X.Y.Z'
+    manifest['version'].should start_with 'X.Y.Z'
 
   end
 
