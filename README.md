@@ -45,7 +45,7 @@ end
 
 The following attributes can be configured:
 
-* without_groups: an array of dependency groups to omit from the bundle.
+* without_groups: an array of dependency groups to omit from the bundle. Defaults: development, test
 
 ### Package Task
 
