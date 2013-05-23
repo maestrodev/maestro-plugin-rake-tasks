@@ -1,6 +1,7 @@
 # Maestro::Plugin::Rake::Tasks
 
-TODO: Write a gem description
+This gem is used to help with the packaging of Maestro Ruby plugins. It provides tasks that can be instantiated and
+used as part of a Rakefile.
 
 ## Installation
 
@@ -18,7 +19,65 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Package Task
+
+This task is used to package the plugin in a zip file. The basic usage assumes that you have a Maven POM file (pom.xml)
+containing the plugin name (artifactId) and version. If you do not have a pom.xml, you can specify the values in the
+Rakefile when configuring the PackageTask. You also must have a manifest template which contains a placeholder for the
+version which will be replaced by the package task.
+
+Example using all defaults and a pom.xml:
+
+```
+Maestro::Plugin::RakeTasks::PackageTask.new
+```
+
+Invoke with a call to *rake package*
+
+Example overriding some values:
+
+```
+Maestro::Plugin::RakeTasks::PackageTask.new do |t|
+  t.verbose=false
+  t.version='1.2.3'
+  t.plugin_name='my-fancy-maestro-plugin'
+end
+```
+
+The following attributes can be configured:
+
+* verbose: enable/disable verbose output. Default: true
+* directories: an array of directories to package. Defaults: src, vendor, images.
+* files: an array of files to package. Defaults: manifest.json, README.md, LICENSE
+* use_pom: read plugin name and version from the pom. Default: true
+* pom_path: path to the pom file. Default: ./pom.xml
+* manifest_template_path: path to the manifest template. Default: ./manifest.template.json
+* version: the plugin version. Defaults to the value defined in the pom.xml. Required if you are not using a pom.xml.
+* plugin_name: the plugin name. Defaults to the value defined in the pom.xml. Required if you are not using a pom.xml.
+* dest_dir: the destination directory of the zip file. Default: .
+
+### Bundle Task
+
+This task is used to update the gem dependencies in the vendor/cache directory. It omits the development and test
+dependency groups before calling the *bundle update* command. Groups to be omitted can be specified with the
+without_groups parameter.
+
+Default example:
+
+```
+Maestro::Plugin::RakeTasks::BundleTask.new
+```
+
+Invoke with a call to *rake bundle*
+
+Example overriding the dependency groups to be omitted:
+
+```
+Maestro::Plugin::RakeTasks::BundleTask.new do |t|
+  t.without_groups= [ 'development' ]
+end
+```
+
 
 ## Contributing
 
