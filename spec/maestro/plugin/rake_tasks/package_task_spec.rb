@@ -57,7 +57,7 @@ describe Maestro::Plugin::RakeTasks::PackageTask do
 
   end
 
-  it 'should create an updated manifest file' do
+  it 'should create an updated manifest file for multi-tasks manifests' do
     @task.stub(:git_version!)
     @task.stub(:create_zip_file)
     @task.run_task true
@@ -66,6 +66,19 @@ describe Maestro::Plugin::RakeTasks::PackageTask do
     File.exists?(manifest_path).should be_true
     manifest = JSON.parse(IO.read(manifest_path))
     manifest.first['version'].should == 'X.Y.Z'
+
+  end
+
+  it 'should create an updated manifest file for single-task manifests' do
+    @task.stub(:git_version!)
+    @task.stub(:create_zip_file)
+    @task.manifest_template_path=File.dirname(__FILE__) + '/../../../manifest-single-task.template.json'
+    @task.run_task true
+
+    manifest_path = File.dirname(__FILE__) + '/../../../../manifest.json'
+    File.exists?(manifest_path).should be_true
+    manifest = JSON.parse(IO.read(manifest_path))
+    manifest['version'].should == 'X.Y.Z'
 
   end
 

@@ -1,0 +1,9 @@
+{
+    "name" : "test",
+    "description" : "test manifest",
+    "license" : "Apache 2.0",
+    "author": "Author",
+    "version": "updated at build time",
+    "class": "SomeClass",
+    "type":"ruby"
+}

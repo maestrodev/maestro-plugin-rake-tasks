@@ -131,7 +131,12 @@ module Maestro
         # update the version number in the manifest file.
         def update_manifest
           manifest = JSON.parse(IO.read(@manifest_template_path))
-          manifest.each { |m| m['version'] = @version }
+          if manifest.instance_of? Array
+            manifest.each { |m| m['version'] = @version }
+          else
+            manifest['version'] = @version
+          end
+
           File.open('manifest.json','w'){ |f| f.write(JSON.pretty_generate(manifest)) }
         end
 
