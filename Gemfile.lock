@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    maestro-plugin-rake-tasks (1.0.0)
+    maestro-plugin-rake-tasks (1.0.1)
       git
       json (>= 1.4.6)
       nokogiri
