@@ -31,15 +31,18 @@ module Maestro
         attr_accessor :files
 
         # Tells the task to read version and plugin name from a pom.xml file
-        # default: true
+        # default:
+        #   true
         attr_accessor :use_pom
 
         # The path to the pom.xml
-        # default: './pom.xml'
+        # default:
+        #   './pom.xml'
         attr_accessor :pom_path
 
         # The path to the manifest template
-        # default: './manifest.template.json'
+        # default:
+        #   './manifest.template.json'
         attr_accessor  :manifest_template_path
 
         # The plugin version
@@ -51,7 +54,8 @@ module Maestro
         attr_accessor :plugin_name
 
         # The destination directory
-        # default: .
+        # default:
+        #   .
         attr_accessor :dest_dir
 
         # Name of task.
