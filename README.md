@@ -19,6 +19,34 @@ Or install it yourself as:
 
 ## Usage
 
+### Bundle Task
+
+This task is used to update the gem dependencies in the vendor/cache directory. It omits the development and test
+dependency groups before calling the *bundle update* command. Groups to be omitted can be specified with the
+without_groups parameter.
+
+Default example:
+
+```
+Maestro::Plugin::RakeTasks::BundleTask.new
+```
+
+Invoke like so
+
+    $ rake bundle
+
+Example overriding the dependency groups to be omitted:
+
+```
+Maestro::Plugin::RakeTasks::BundleTask.new do |t|
+  t.without_groups= [ 'development' ]
+end
+```
+
+The following attributes can be configured:
+
+* without_groups: an array of dependency groups to omit from the bundle.
+
 ### Package Task
 
 This task is used to package the plugin in a zip file. The basic usage assumes that you have a Maven POM file (pom.xml)
@@ -32,7 +60,9 @@ Example using all defaults and a pom.xml:
 Maestro::Plugin::RakeTasks::PackageTask.new
 ```
 
-Invoke with a call to *rake package*
+Invoke like so:
+
+    $ rake package
 
 Example overriding some values:
 
@@ -56,28 +86,31 @@ The following attributes can be configured:
 * plugin_name: the plugin name. Defaults to the value defined in the pom.xml. Required if you are not using a pom.xml.
 * dest_dir: the destination directory of the zip file. Default: .
 
-### Bundle Task
+## Example Rakefile
 
-This task is used to update the gem dependencies in the vendor/cache directory. It omits the development and test
-dependency groups before calling the *bundle update* command. Groups to be omitted can be specified with the
-without_groups parameter.
-
-Default example:
+The following is an example Rakefile that can be used to build and test most Maestro Ruby plugins.
 
 ```
-Maestro::Plugin::RakeTasks::BundleTask.new
-```
+require 'rake/clean'
+require 'maestro/plugin/rake_tasks'
+require 'rspec/core/rake_task'
 
-Invoke with a call to *rake bundle*
+$:.push File.expand_path("../src", __FILE__)
 
-Example overriding the dependency groups to be omitted:
+CLEAN.include("manifest.json", "*-plugin-*.zip", "vendor", "package", "tmp", ".bundle")
 
-```
-Maestro::Plugin::RakeTasks::BundleTask.new do |t|
-  t.without_groups= [ 'development' ]
+task :default => :all
+task :all => [:clean, :bundle, :spec, :package]
+
+desc "Run specs"
+RSpec::Core::RakeTask.new do |t|
+  t.rspec_opts = "--format p --color"
 end
-```
 
+Maestro::Plugin::RakeTasks::BundleTask.new
+
+Maestro::Plugin::RakeTasks::PackageTask.new
+```
 
 ## Contributing
 
