@@ -30,6 +30,18 @@ module Maestro
         #   [ 'manifest.json', 'README.md', 'LICENSE' ]
         attr_accessor :files
 
+        # Tells the task to read version and plugin name from a pom.xml file
+        # default: true
+        attr_accessor :use_pom
+
+        # The path to the pom.xml
+        # default: './pom.xml'
+        attr_accessor :pom_path
+
+        # The path to the manifest template
+        # default: './manifest.template.json'
+        attr_accessor  :manifest_template_path
+
         # The plugin version
         # default read from pom.xml (version)
         attr_accessor :version
@@ -38,9 +50,9 @@ module Maestro
         # default read from pom.xml (artifactId)
         attr_accessor :plugin_name
 
-        # The zip file name
-        # default: plugin_name + '_' + version + '.zip'
-        attr_accessor :zip_file
+        # The destination directory
+        # default: .
+        attr_accessor :dest_dir
 
         # Name of task.
         #
@@ -63,60 +75,81 @@ module Maestro
 
         def setup_ivars(args)
           @name = args.shift || :package
-          @verbose = true
+          @verbose, @use_pom = true, true
           @directories = [ 'src', 'vendor', 'images' ]
           @files = [ 'manifest.json', 'README.md', 'LICENSE' ]
-          pom = File.open('pom.xml')
-          doc = Nokogiri::XML(pom.read)
-          pom.close
-          @plugin_name = doc.at_xpath('/xmlns:project/xmlns:artifactId').text
-          file_version = doc.at_xpath('/xmlns:project/xmlns:version').text
-          @zip_file = "#{@plugin_name}-#{file_version}.zip"
-          @version = File.exists?('.git') ? git_version(file_version) : file_version
+          @version, @plugin_name = nil, nil
+          @dest_dir = '.'
+          @pom_path = './pom.xml'
+          @manifest_template_path = './manifest.template.json'
         end
 
         def run_task(verbose)
-          update_manifest
+          parse_pom if @use_pom
 
-          Zippy.create zip_file do |z|
-            @directories.each { |dir| add_dir z, '.', dir }
-            @files.each { |file| add_file z, '.', file}
-          end
+          # Make sure we have a valid name and version
+          abort "ERROR: Plugin name is missing" unless @plugin_name
+          abort "ERROR: Plugin version is missing" unless @version
+
+          # Add the commit hash to the version if it's available
+          git_version! if File.exists?('.git')
+
+          # If we use a template, use it to create the manifest
+          update_manifest if File.exists?(@manifest_template_path)
+
+          # Create the zip file
+          create_zip_file("#{@plugin_name}-#{@version}.zip")
 
         end
 
         private
 
-        def git_version(version)
+        def parse_pom
+          pom = File.open(@pom_path)
+          doc = Nokogiri::XML(pom.read)
+          pom.close
+          @plugin_name ||= doc.at_xpath('/xmlns:project/xmlns:artifactId').text
+          @version ||= doc.at_xpath('/xmlns:project/xmlns:version').text
+        end
+
+        def git_version!
           git = Git.open('.')
           # check if there are modified files
           if git.status.select { |s| s.type == 'M' }.empty?
             commit = git.log.first.sha[0..5]
-            version = "#{version}-#{commit}"
+            @version = "#{@version}-#{commit}"
           else
-            puts "WARNING: There are modified files, not using commit hash in version"
+            warn "WARNING: There are modified files, not using commit hash in version"
           end
-          version
+          @version
         end
 
-
+        # update the version number in the manifest file.
         def update_manifest
-          # update manifest
-          manifest = JSON.parse(IO.read('manifest.template.json'))
+          manifest = JSON.parse(IO.read(@manifest_template_path))
           manifest.each { |m| m['version'] = @version }
           File.open('manifest.json','w'){ |f| f.write(JSON.pretty_generate(manifest)) }
         end
 
-        def add_file( zippyfile, dst_dir, f )
-          puts "Writing #{f} at #{dst_dir}"  if verbose
-          zippyfile["#{dst_dir}/#{f}"] = File.open(f)
+        def create_zip_file(zip_file)
+          Zippy.create zip_file do |z|
+            @directories.each { |dir| add_dir z, dir }
+            @files.each { |file| add_file z, file }
+          end
         end
 
-        def add_dir( zippyfile, dst_dir, d )
+        # add a file to the zip file
+        def add_file( zippyfile, f )
+          puts "Writing #{f} at #{@dest_dir}"  if verbose
+          zippyfile["#{@dest_dir}/#{f}"] = File.open(f)
+        end
+
+        # add a directory to the zip file
+        def add_dir( zippyfile, d )
           glob = "#{d}/**/*"
           FileList.new( glob ).each { |f|
             if (File.file?(f))
-              add_file zippyfile, dst_dir, f
+              add_file zippyfile, f
             end
           }
         end
