@@ -82,6 +82,21 @@ describe Maestro::Plugin::RakeTasks::PackageTask do
 
   end
 
+  it 'should create an updated manifest file for new multi-tasks manifests' do
+    @task.stub(:git_version!)
+    @task.stub(:create_zip_file)
+    @task.manifest_template_path=File.dirname(__FILE__) + '/../../../manifest-multi-task.template.json'
+    @task.run_task true
+
+    manifest_path = File.dirname(__FILE__) + '/../../../../manifest.json'
+    File.exists?(manifest_path).should be_true
+    manifest = JSON.parse(IO.read(manifest_path))
+    manifest['tasks'].length.should == 2
+    manifest['tasks'].first['version'].should start_with 'X.Y.Z'
+    manifest['tasks'].last['version'].should start_with 'X.Y.Z'
+
+  end
+
   it 'should name the zip file based on the plugin_name and version' do
     @task.stub(:git_version!)
     @task.stub(:update_manifest)
