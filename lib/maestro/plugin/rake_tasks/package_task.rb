@@ -114,6 +114,7 @@ module Maestro
         end
 
         def git_version
+          return @version unless Dir.exists?(".git")
           git = Git.open('.')
           # check if there are modified files
           if git.status.select { |s| s.type == 'M' }.empty?
@@ -127,8 +128,6 @@ module Maestro
 
         # update the version number in the manifest file.
         def update_manifest(manifest_version)
-          return @version unless File.exists?('.git')
-
           manifest = JSON.parse(IO.read(@manifest_template_path))
           if manifest.instance_of? Array
             manifest.each { |m| m['version'] = manifest_version }
