@@ -149,8 +149,12 @@ module Maestro
 
         # add a file to the zip file
         def add_file( zippyfile, f )
-          puts "Writing #{f} at #{@dest_dir}"  if verbose
-          zippyfile["#{@dest_dir}/#{f}"] = File.open(f)
+          if File.exists?(f)
+            puts "Writing #{f} at #{@dest_dir}" if verbose
+            zippyfile["#{@dest_dir}/#{f}"] = File.open(f)
+          else
+            puts "Ignoring missing file #{f} at #{@dest_dir}"
+          end
         end
 
         # add a directory to the zip file
