@@ -1,6 +1,10 @@
 require 'aruba/cucumber'
 require 'zip'
 
+Before do
+  @aruba_timeout_seconds = 5
+end
+
 Then /^the zip file "([^"]*)" should contain the following files:$/ do |zipFile, files|
   entries = []
   prep_for_fs_check do
