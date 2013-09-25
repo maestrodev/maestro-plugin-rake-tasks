@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rake', '>=0.9.2'
   spec.add_dependency 'nokogiri'
   spec.add_dependency 'git'
-  spec.add_dependency 'zippy'
+  spec.add_dependency 'rubyzip', '>=1.0.0'
   spec.add_dependency 'json', '>= 1.4.6'
 
   spec.add_development_dependency 'rspec', '>= 2.13.0'
