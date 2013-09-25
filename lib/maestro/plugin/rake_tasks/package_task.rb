@@ -1,7 +1,7 @@
 require 'maestro/plugin/rake_tasks/version'
 require 'rake'
 require 'rake/tasklib'
-require 'zippy'
+require 'zip'
 require 'git'
 require 'nokogiri'
 require 'json'
@@ -141,30 +141,25 @@ module Maestro
         end
 
         def create_zip_file(zip_file)
-          Zippy.create zip_file do |z|
+          Zip::File.open(zip_file, Zip::File::CREATE) do |z|
             @directories.each { |dir| add_dir z, dir }
             @files.each { |file| add_file z, file }
           end
         end
 
         # add a file to the zip file
-        def add_file( zippyfile, f )
+        def add_file( zipfile, f )
           if File.exists?(f)
             puts "Writing #{f} at #{@dest_dir}" if verbose
-            zippyfile["#{@dest_dir}/#{f}"] = File.open(f)
+            zipfile.add(f, "#{@dest_dir}/#{f}")
           else
             puts "Ignoring missing file #{f} at #{@dest_dir}"
           end
         end
 
         # add a directory to the zip file
-        def add_dir( zippyfile, d )
-          glob = "#{d}/**/*"
-          FileList.new( glob ).each { |f|
-            if (File.file?(f))
-              add_file zippyfile, f
-            end
-          }
+        def add_dir( zipfile, d )
+          FileList.new("#{d}/**/*").each { |f| add_file(zipfile, f) if File.file?(f) }
         end
 
       end
