@@ -2,7 +2,7 @@ require 'aruba/cucumber'
 require 'zip'
 
 Before do
-  @aruba_timeout_seconds = 10
+  @aruba_timeout_seconds = 20
 end
 
 Then /^the zip file "([^"]*)" should contain the following files:$/ do |zipFile, files|
