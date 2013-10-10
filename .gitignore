@@ -12,3 +12,4 @@ test/version_tmp
 tmp
 manifest.json
 Gemfile.lock
+/maestro-test-plugin-X.Y.Z.zip

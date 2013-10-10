@@ -7,6 +7,8 @@
   <version>X.Y.Z</version>
   <name>maestro-test-plugin</name>
   <packaging>pom</packaging>
+  <description>a description</description>
+  <url>http://acme.com</url>
 
 
 </project>

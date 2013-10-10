@@ -1,9 +1,9 @@
 require 'maestro/plugin/rake_tasks/version'
+require 'maestro/plugin/rake_tasks/pom'
 require 'rake'
 require 'rake/tasklib'
 require 'zip'
 require 'git'
-require 'nokogiri'
 require 'json'
 
 
@@ -106,11 +106,9 @@ module Maestro
         private
 
         def parse_pom
-          pom = File.open(@pom_path)
-          doc = Nokogiri::XML(pom.read)
-          pom.close
-          @plugin_name ||= doc.at_xpath('/xmlns:project/xmlns:artifactId').text
-          @version ||= doc.at_xpath('/xmlns:project/xmlns:version').text
+          pom = Pom.new(@pom_path)
+          @plugin_name ||= pom.artifact_id
+          @version ||= pom.version
         end
 
         def git_version
