@@ -129,10 +129,11 @@ module Maestro
           manifest = JSON.parse(IO.read(@manifest_template_path))
           if manifest.instance_of? Array
             manifest.each { |m| m['version'] = manifest_version }
-          elsif !manifest['tasks'].nil? and manifest['tasks'].instance_of? Array
-            manifest['tasks'].each { |m| m['version'] = manifest_version }
           else
             manifest['version'] = manifest_version
+            if !manifest['tasks'].nil? and manifest['tasks'].instance_of? Array
+              manifest['tasks'].each { |m| m['version'] = manifest_version }
+            end
           end
 
           File.open('manifest.json','w'){ |f| f.write(JSON.pretty_generate(manifest)) }
